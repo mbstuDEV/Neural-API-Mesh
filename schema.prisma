@@ -1,0 +1,48 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ── API Keys ───────────────────────────────────────────────────────────────
+
+model ApiKey {
+  id        String    @id @default(cuid())
+  name      String
+  plan      String    @default("free") // free | pro | enterprise
+  keyHash   String    @unique          // SHA-256 of the raw JWT — never store raw
+  createdAt DateTime  @default(now())
+  expiresAt DateTime?
+  revokedAt DateTime?
+
+  logs InferenceLog[]
+
+  @@map("api_keys")
+}
+
+// ── Inference Logs ─────────────────────────────────────────────────────────
+
+model InferenceLog {
+  id               String   @id @default(cuid())
+  inferenceId      String   @unique // Provider-returned or generated ID
+  apiKeyId         String
+  model            String
+  provider         String
+  task             String
+  promptTokens     Int      @default(0)
+  completionTokens Int      @default(0)
+  totalTokens      Int      @default(0)
+  latencyMs        Int
+  timestamp        DateTime @default(now())
+
+  apiKey ApiKey @relation(fields: [apiKeyId], references: [id])
+
+  @@index([apiKeyId])
+  @@index([timestamp])
+  @@index([model])
+  @@index([provider])
+  @@map("inference_logs")
+}

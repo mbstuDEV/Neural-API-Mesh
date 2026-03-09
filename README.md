@@ -298,4 +298,4 @@ See `.github/workflows/deploy.yml` for full configuration.
 
 ## License
 
-Private. All rights reserved. © 2026 muntasirbergam.studio
+Private. All rights reserved. © 2024 muntasirbergam.studio
